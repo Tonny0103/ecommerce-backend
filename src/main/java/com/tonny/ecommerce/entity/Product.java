@@ -22,10 +22,12 @@ public class Product {
     @EqualsAndHashCode.Include
     private UUID id;
 
-    @Column(name = "title", unique = true)
+    @Column(name = "title", unique = true, nullable = false)
+    @EqualsAndHashCode.Include
     private String title;
 
-    @Column(name = "description")
+    @Column(name = "description", unique = true, nullable = false)
+    @EqualsAndHashCode.Include
     private String description;
 
     @Column(name = "reviews")
