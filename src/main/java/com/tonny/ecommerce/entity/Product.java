@@ -22,7 +22,7 @@ public class Product {
     @EqualsAndHashCode.Include
     private UUID id;
 
-    @Column(name = "title")
+    @Column(name = "title", unique = true)
     private String title;
 
     @Column(name = "description")
