@@ -3,6 +3,7 @@ package com.tonny.ecommerce.controller;
 import com.tonny.ecommerce.DTO.PostProductRequestDTO;
 import com.tonny.ecommerce.DTO.PostProductResponseDTO;
 import com.tonny.ecommerce.service.ProductService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,6 +22,6 @@ public class ProductController {
 
     @PostMapping("/create-product")
     public ResponseEntity<PostProductResponseDTO> createProduct(@RequestBody PostProductRequestDTO productRequestDTO) {
-        return ResponseEntity.ok(productService.createProduct(productRequestDTO));
+        return ResponseEntity.status(HttpStatus.CREATED).body(productService.createProduct(productRequestDTO));
     }
 }
