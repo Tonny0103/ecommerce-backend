@@ -33,15 +33,15 @@ public class Product {
     @EqualsAndHashCode.Include
     private String description;
 
-    @Column(name = "reviews")
+    @Column(name = "reviews", nullable = false)
     @ColumnDefault(value = "0")
-    private Double reviews;
+    private Double reviews = 0.0;
 
-    @Column(name = "reviews_count")
+    @Column(name = "reviews_count", nullable = false)
     @ColumnDefault(value = "0")
-    private Integer reviewsCount;
+    private Integer reviewsCount = 0;
 
-    @Column(name = "price")
+    @Column(name = "price", nullable = false)
     private Double price;
 
     @CreationTimestamp
