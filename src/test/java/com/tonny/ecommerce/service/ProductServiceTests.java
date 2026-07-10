@@ -13,9 +13,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -62,6 +64,23 @@ public class ProductServiceTests {
 
         assertThrows(ProductAlreadyExistsException.class, () -> productService.createProduct(product));
         verify(productRepository).existsByTitleAndDescription(product.title(), product.description());
+    }
+
+    @Test
+    @DisplayName("Must return all products")
+    void mustReturnAllProducts() {
+        PostProductRequestDTO product1 = new PostProductRequestDTO("title1", "description1", 10.0);
+        PostProductRequestDTO product2 = new PostProductRequestDTO("title2", "description2", 20.0);
+        Product savedProduct1 = fakeSavedProduct(product1);
+        Product savedProduct2 = fakeSavedProduct(product2);
+
+        when(productRepository.findAll()).thenReturn(java.util.List.of(savedProduct1, savedProduct2));
+
+        List<Product> products = productService.getAllProducts();
+
+        assertEquals(2, products.size());
+        assertEquals(savedProduct1, products.get(0));
+        assertEquals(savedProduct2, products.get(1));
     }
 
     private Product fakeSavedProduct(PostProductRequestDTO product) {

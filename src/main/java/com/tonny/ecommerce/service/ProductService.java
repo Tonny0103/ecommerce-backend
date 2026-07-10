@@ -7,6 +7,8 @@ import com.tonny.ecommerce.exception.ProductAlreadyExistsException;
 import com.tonny.ecommerce.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ProductService {
 
@@ -34,5 +36,9 @@ public class ProductService {
                 savedProduct.getCreatedAt(),
                 savedProduct.getUpdatedAt()
         );
+    }
+
+    public List<Product> getAllProducts() {
+        return productRepository.findAll();
     }
 }
