@@ -3,7 +3,7 @@ package com.tonny.ecommerce.DTO;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public record PostProductResponseDTO(
+public record ProductDTO(
         UUID id,
         String title,
         String description,

@@ -1,8 +1,9 @@
 package com.tonny.ecommerce.controller;
 
 import com.tonny.ecommerce.DTO.PostProductRequestDTO;
-import com.tonny.ecommerce.DTO.PostProductResponseDTO;
+import com.tonny.ecommerce.DTO.ProductDTO;
 import com.tonny.ecommerce.service.ProductService;
+import com.tonny.ecommerce.utils.ProductTestsUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,11 +12,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
+import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.UnsupportedEncodingException;
-import java.time.LocalDateTime;
-import java.util.UUID;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -37,14 +38,14 @@ public class ProductControllerTests {
         PostProductRequestDTO request = new PostProductRequestDTO("title", "description", 10.0);
         String jsonRequest = json.writeValueAsString(request);
 
-        when(productService.createProduct(request)).thenReturn(fakeResponse(request));
+        when(productService.createProduct(request)).thenReturn(ProductTestsUtils.fakeResponse(request));
 
         MvcTestResult testResult = mvc.post().uri("/product/create-product")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonRequest)
                 .exchange();
 
-        PostProductResponseDTO response = json.readValue(testResult.getResponse().getContentAsString(), PostProductResponseDTO.class);
+        ProductDTO response = json.readValue(testResult.getResponse().getContentAsString(), ProductDTO.class);
 
         assertThat(response).isNotNull();
         assertThat(response.id()).isNotNull();
@@ -54,19 +55,20 @@ public class ProductControllerTests {
         assertThat(response.reviews()).isEqualTo(0.0);
         assertThat(response.reviewsCount()).isEqualTo(0);
         assertThat(response.createdAt()).isNotNull();
-        assertThat(response.updatedAt()).isNull();
+        assertThat(response.updatedAt()).isNotNull();
     }
 
-    private PostProductResponseDTO fakeResponse(PostProductRequestDTO request) {
-        return new PostProductResponseDTO(
-                UUID.randomUUID(),
-                request.title(),
-                request.description(),
-                0.0,
-                0,
-                request.price(),
-                LocalDateTime.now(),
-                null
-        );
+    @Test
+    @DisplayName("Must return all products successfully")
+    void mustReturnAllProductsSuccessfully() throws UnsupportedEncodingException {
+        when(productService.getAllProducts()).thenReturn(ProductTestsUtils.fakeResponseList());
+
+        MvcTestResult testResult = mvc.get().uri("/product/get-all-products")
+                .exchange();
+
+        List<ProductDTO> response = json.readValue(testResult.getResponse().getContentAsString(), new TypeReference<List<ProductDTO>>() {});
+
+        assertThat(response).isNotNull();
+        assertThat(response).hasSize(3);
     }
 }

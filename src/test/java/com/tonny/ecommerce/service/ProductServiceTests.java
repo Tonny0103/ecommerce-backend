@@ -1,10 +1,11 @@
 package com.tonny.ecommerce.service;
 
 import com.tonny.ecommerce.DTO.PostProductRequestDTO;
-import com.tonny.ecommerce.DTO.PostProductResponseDTO;
+import com.tonny.ecommerce.DTO.ProductDTO;
 import com.tonny.ecommerce.entity.Product;
 import com.tonny.ecommerce.exception.ProductAlreadyExistsException;
 import com.tonny.ecommerce.repository.ProductRepository;
+import com.tonny.ecommerce.utils.ProductTestsUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,12 +37,12 @@ public class ProductServiceTests {
     @DisplayName("Must create product with unique title and description")
     void mustCreateProductWithUniqueTitleAndDescription() {
         PostProductRequestDTO product = new PostProductRequestDTO("title", "description", 10.0);
-        Product saved = fakeSavedProduct(product);
+        Product saved = new Product(UUID.randomUUID(), product.title(), product.description(), 0.0, 0, product.price(), LocalDateTime.now(), LocalDateTime.now());
 
         when(productRepository.existsByTitleAndDescription(product.title(), product.description())).thenReturn(false);
         when(productRepository.save(any(Product.class))).thenReturn(saved);
 
-        PostProductResponseDTO response = productService.createProduct(product);
+        ProductDTO response = productService.createProduct(product);
 
         verify(productRepository).existsByTitleAndDescription(product.title(), product.description());
         verify(productRepository).save(any(Product.class));
@@ -69,29 +70,12 @@ public class ProductServiceTests {
     @Test
     @DisplayName("Must return all products")
     void mustReturnAllProducts() {
-        PostProductRequestDTO product1 = new PostProductRequestDTO("title1", "description1", 10.0);
-        PostProductRequestDTO product2 = new PostProductRequestDTO("title2", "description2", 20.0);
-        Product savedProduct1 = fakeSavedProduct(product1);
-        Product savedProduct2 = fakeSavedProduct(product2);
+        when(productRepository.findAll()).thenReturn(ProductTestsUtils.fakeEntityList());
 
-        when(productRepository.findAll()).thenReturn(java.util.List.of(savedProduct1, savedProduct2));
-
-        List<Product> products = productService.getAllProducts();
+        List<ProductDTO> products = productService.getAllProducts();
 
         assertEquals(2, products.size());
-        assertEquals(savedProduct1, products.get(0));
-        assertEquals(savedProduct2, products.get(1));
     }
 
-    private Product fakeSavedProduct(PostProductRequestDTO product) {
-        Product saved = new Product();
-        saved.setId(UUID.randomUUID());
-        saved.setTitle(product.title());
-        saved.setDescription(product.description());
-        saved.setPrice(product.price());
-        saved.setReviews(0.0);
-        saved.setReviewsCount(0);
-        saved.setCreatedAt(LocalDateTime.now());
-        return saved;
-    }
+
 }

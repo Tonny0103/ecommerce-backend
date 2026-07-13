@@ -1,7 +1,7 @@
 package com.tonny.ecommerce.service;
 
 import com.tonny.ecommerce.DTO.PostProductRequestDTO;
-import com.tonny.ecommerce.DTO.PostProductResponseDTO;
+import com.tonny.ecommerce.DTO.ProductDTO;
 import com.tonny.ecommerce.entity.Product;
 import com.tonny.ecommerce.exception.ProductAlreadyExistsException;
 import com.tonny.ecommerce.repository.ProductRepository;
@@ -18,7 +18,7 @@ public class ProductService {
         this.productRepository = productRepository;
     }
 
-    public PostProductResponseDTO createProduct(PostProductRequestDTO productRequestDTO) {
+    public ProductDTO createProduct(PostProductRequestDTO productRequestDTO) {
         if (productRepository.existsByTitleAndDescription(productRequestDTO.title(), productRequestDTO.description())) {
             throw new ProductAlreadyExistsException(productRequestDTO.title());
         }
@@ -26,7 +26,7 @@ public class ProductService {
         Product product = new Product(productRequestDTO.title(), productRequestDTO.description(), productRequestDTO.price());
         Product savedProduct = productRepository.save(product);
 
-        return new PostProductResponseDTO(
+        return new ProductDTO(
                 savedProduct.getId(),
                 savedProduct.getTitle(),
                 savedProduct.getDescription(),
@@ -38,7 +38,18 @@ public class ProductService {
         );
     }
 
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
+    public List<ProductDTO> getAllProducts() {
+        List<Product> products = productRepository.findAll();
+
+        return products.stream().map(product -> new ProductDTO(
+                product.getId(),
+                product.getTitle(),
+                product.getDescription(),
+                product.getReviews(),
+                product.getReviewsCount(),
+                product.getPrice(),
+                product.getCreatedAt(),
+                product.getUpdatedAt()
+        )).toList();
     }
 }
