@@ -24,8 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ProductServiceTests {
@@ -103,5 +102,18 @@ public class ProductServiceTests {
         UUID id = UUID.randomUUID();
 
         assertThrows(ProductNotFoundException.class, () -> productService.patchProduct(id, new PatchProductRequestDTO("new title", null, null)));
+    }
+
+    @Test
+    @DisplayName("Must delete product")
+    void mustDeleteProduct() {
+        UUID id = UUID.randomUUID();
+
+        when(productRepository.existsById(id)).thenReturn(true);
+        doNothing().when(productRepository).deleteById(id);
+
+        productService.deleteById(id);
+
+        verify(productRepository).deleteById(id);
     }
 }

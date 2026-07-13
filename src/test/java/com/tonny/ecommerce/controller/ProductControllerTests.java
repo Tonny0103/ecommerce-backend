@@ -10,6 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
@@ -19,8 +20,10 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 @WebMvcTest(ProductController.class)
@@ -92,5 +95,18 @@ public class ProductControllerTests {
 
         assertThat(response).isNotNull();
         assertThat(response.title()).isEqualTo(edited.title());
+    }
+
+    @Test
+    @DisplayName("Must delete product successfully")
+    void mustDeleteProductSuccessfully() {
+        UUID id = UUID.randomUUID();
+
+        doNothing().when(productService).deleteById(id);
+
+        MvcTestResult testResult = mvc.delete().uri("/product/delete-product/{id}", id)
+                .exchange();
+
+        assertThat(testResult.getResponse().getStatus()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 }

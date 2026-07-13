@@ -81,4 +81,12 @@ public class ProductService {
                 edited.getUpdatedAt()
         );
     }
+
+    public void deleteById(UUID id) {
+        if (!productRepository.existsById(id)) {
+            throw new ProductNotFoundException(String.format("Product with id %s not found", id));
+        }
+
+        productRepository.deleteById(id);
+    }
 }
