@@ -1,7 +1,9 @@
 package com.tonny.ecommerce.controller;
 
+import com.tonny.ecommerce.DTO.PatchProductRequestDTO;
 import com.tonny.ecommerce.DTO.PostProductRequestDTO;
 import com.tonny.ecommerce.DTO.ProductDTO;
+import com.tonny.ecommerce.entity.Product;
 import com.tonny.ecommerce.service.ProductService;
 import com.tonny.ecommerce.utils.ProductTestsUtils;
 import org.junit.jupiter.api.DisplayName;
@@ -70,5 +72,25 @@ public class ProductControllerTests {
 
         assertThat(response).isNotNull();
         assertThat(response).hasSize(3);
+    }
+
+    @Test
+    @DisplayName("Must patch product with new title")
+    void mustPatchProductWithNewTitle() throws UnsupportedEncodingException {
+        Product product = ProductTestsUtils.fakeEntity();
+        String jsonRequest = json.writeValueAsString(new PatchProductRequestDTO("new title", null, null));
+        ProductDTO edited = ProductTestsUtils.fakeResponse(new PostProductRequestDTO("new title", "description", 10.0));
+
+        when(productService.patchProduct(product.getId(), new PatchProductRequestDTO("new title", null, null))).thenReturn(edited);
+
+        MvcTestResult testResult = mvc.patch().uri("/product/patch-product/{id}", product.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonRequest)
+                .exchange();
+
+        ProductDTO response = json.readValue(testResult.getResponse().getContentAsString(), ProductDTO.class);
+
+        assertThat(response).isNotNull();
+        assertThat(response.title()).isEqualTo(edited.title());
     }
 }

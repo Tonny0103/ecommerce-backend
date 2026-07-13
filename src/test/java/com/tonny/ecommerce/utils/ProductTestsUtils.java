@@ -10,6 +10,10 @@ import java.util.UUID;
 
 public class ProductTestsUtils {
 
+    public static Product fakeEntity() {
+        return new Product(UUID.randomUUID(), "title", "description", 0.0, 0, 10.0, LocalDateTime.now(), LocalDateTime.now());
+    }
+
     public static List<Product> fakeEntityList() {
         return List.of(
                 new Product(UUID.randomUUID(), "title1", "description1", 0.0, 0, 10.0, LocalDateTime.now(), LocalDateTime.now()),

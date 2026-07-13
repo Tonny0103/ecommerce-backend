@@ -1,9 +1,11 @@
 package com.tonny.ecommerce.service;
 
+import com.tonny.ecommerce.DTO.PatchProductRequestDTO;
 import com.tonny.ecommerce.DTO.PostProductRequestDTO;
 import com.tonny.ecommerce.DTO.ProductDTO;
 import com.tonny.ecommerce.entity.Product;
 import com.tonny.ecommerce.exception.ProductAlreadyExistsException;
+import com.tonny.ecommerce.exception.ProductNotFoundException;
 import com.tonny.ecommerce.repository.ProductRepository;
 import com.tonny.ecommerce.utils.ProductTestsUtils;
 import org.junit.jupiter.api.DisplayName;
@@ -15,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -77,5 +80,28 @@ public class ProductServiceTests {
         assertEquals(2, products.size());
     }
 
+    @Test
+    @DisplayName("Must edit product with new valid title")
+    void mustEditProductWithNewValidTitle() {
+        UUID id = UUID.randomUUID();
+        LocalDateTime now = LocalDateTime.now();
 
+        Product product = new Product(id, "title", "description", 0.0, 0, 10.0, now, now);
+        Product edited = new Product(id, "new title", "description", 0.0, 0, 10.0, now, LocalDateTime.now());
+
+        when(productRepository.findById(id)).thenReturn(Optional.of(product));
+        when(productRepository.save(any(Product.class))).thenReturn(edited);
+
+        ProductDTO response = productService.patchProduct(id, new PatchProductRequestDTO("new title", null, null));
+
+        verify(productRepository).save(edited);
+    }
+
+    @Test
+    @DisplayName("Must throw exception when product not found")
+    void mustThrowExceptionWhenProductNotFound() {
+        UUID id = UUID.randomUUID();
+
+        assertThrows(ProductNotFoundException.class, () -> productService.patchProduct(id, new PatchProductRequestDTO("new title", null, null)));
+    }
 }
