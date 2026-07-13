@@ -31,11 +31,11 @@ public class Product {
     @EqualsAndHashCode.Include
     private String description;
 
-    @Column(name = "reviews", nullable = false)
+    @Column(name = "reviews")
     @ColumnDefault(value = "0")
     private Double reviews = 0.0;
 
-    @Column(name = "reviews_count", nullable = false)
+    @Column(name = "reviews_count")
     @ColumnDefault(value = "0")
     private Integer reviewsCount = 0;
 
