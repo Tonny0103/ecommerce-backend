@@ -70,13 +70,37 @@ public class ProductServiceTests {
     }
 
     @Test
+    void mustNotSaveProductWhenProductAlreadyExists() {
+        PostProductRequestDTO product = new PostProductRequestDTO("title", "description", 10.0);
+
+        when(productRepository.existsByTitleAndDescription(product.title(), product.description())).thenReturn(true);
+
+        assertThrows(ProductAlreadyExistsException.class, () -> productService.createProduct(product));
+        verify(productRepository, never()).save(any());
+    }
+
+    @Test
     @DisplayName("Must return all products")
     void mustReturnAllProducts() {
         when(productRepository.findAll()).thenReturn(ProductTestsUtils.fakeEntityList());
 
         List<ProductDTO> products = productService.getAllProducts();
 
-        assertEquals(2, products.size());
+        assertThat(products).hasSize(2).allSatisfy(p -> {
+            assertThat(p.id()).isNotNull();
+            assertThat(p.title()).isNotBlank();
+            assertThat(p.description()).isNotBlank();
+        });
+    }
+
+    @Test
+    @DisplayName("Must return empty list when no products found")
+    void mustReturnEmptyListWhenThereAreNoProducts() {
+        when(productRepository.findAll()).thenReturn(List.of());
+        List<ProductDTO> products = productService.getAllProducts();
+
+        assertThat(products).isEmpty();
+        verify(productRepository).findAll();
     }
 
     @Test
